@@ -342,14 +342,25 @@ export class PodView extends React.Component<PodViewProps> {
                     }
                 });
             } else if (sortMode === 'topLevelResource') {
-                let cur = rnode.uid;
+                let curId = rnode.uid;
                 let parents = parentsFor[rnode.uid];
+                let parentRef = parents[0];
                 while ((parents || []).length > 0) {
-                    cur = parents[0].uid;
-                    parents = parentsFor[cur];
+                    curId = parents[0].uid;
+                    parentRef = parents[0];
+                    parents = parentsFor[curId];
                 }
-                if (groupRefs[cur]) {
-                    groupRefs[cur].pods.push(p);
+                if (parentRef) {
+                    if (groupRefs[curId]) {
+                        groupRefs[curId].pods.push(p);
+                    } else {
+                        groupRefs[parentRef.uid] = {
+                            kind: parentRef.kind,
+                            type: sortMode,
+                            name: parentRef.name,
+                            pods: [p]
+                        };
+                    }
                 }
             }
         });
